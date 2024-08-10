@@ -10,11 +10,12 @@ class Stack<T> implements IStack<T> {
 
   constructor(private capacity: number = Infinity) {}
 
-  push(item: T): void {
+  push(item: T): Stack<T> {
     if (this.size() === this.capacity) {
       throw Error("Stack has reached maximum capacity.");
     }
     this.data.push(item);
+    return this;
   }
 
   pop(): T | undefined {

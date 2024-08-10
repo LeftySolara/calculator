@@ -1,31 +1,43 @@
 import { useState } from "react";
-import NumberButton from "./components/NumberButton/NumberButton";
 import ResultDisplay from "./components/ResultDisplay/ResultDisplay";
+import Stack from "./lib/stack";
 
 function App() {
-  const [displayValue, setDisplayValue] = useState<string>("0");
+  const [valueDisplay, setValueDisplay] = useState<string>("");
+  const [stack, setStack] = useState<Stack<string>>(new Stack<string>(4));
 
   const addDigit = (digit: string): void => {
-    if (displayValue.length < 9) {
-      setDisplayValue(displayValue + digit);
+    if (valueDisplay.length < 9) {
+      setValueDisplay(valueDisplay + digit);
     }
   };
 
-  const handleNumberButtonClick = (value: string) => {
-    addDigit(value);
+  const addOperator = (operator: string): void => {
+    if (valueDisplay.length > 0) {
+      setStack(stack.push(valueDisplay));
+    }
+    setValueDisplay(operator);
   };
 
-  const numberButtons = [];
+  const numberButtons: JSX.Element[] = [];
   for (let i = 0; i < 10; ++i) {
-    numberButtons[i] = (
-      <NumberButton value={i} handleClick={handleNumberButtonClick} />
+    const button = (
+      <button onClick={() => addDigit(i.toString())}>{i.toString()}</button>
     );
+    numberButtons.push(button);
   }
+
+  const operatorButtons: JSX.Element[] = ["+", "-", "*", "/"].map(
+    (operator) => (
+      <button onClick={() => addOperator(operator)}>{operator}</button>
+    ),
+  );
 
   return (
     <div id="App">
-      <ResultDisplay value={displayValue} />
+      <ResultDisplay value={valueDisplay} />
       <div>{numberButtons.map((btn) => btn)}</div>
+      <div>{operatorButtons.map((btn) => btn)}</div>
     </div>
   );
 }
