@@ -3,20 +3,35 @@ import ResultDisplay from "./components/ResultDisplay/ResultDisplay";
 import Stack from "./lib/stack";
 
 function App() {
-  const [valueDisplay, setValueDisplay] = useState<string>("");
-  const [stack, setStack] = useState<Stack<string>>(new Stack<string>(4));
+  // TODO: Move stack and operations to the backend.
+  const [displayedValue, setDisplayedValue] = useState<string>("");
+  const [displayedOperator, setDisplayedOperator] = useState<string>("");
+  const [stack, setStack] = useState<Stack<string>>(new Stack<string>(255));
 
   const addDigit = (digit: string): void => {
-    if (valueDisplay.length < 9) {
-      setValueDisplay(valueDisplay + digit);
+    if (displayedValue.length < 8) {
+      setDisplayedValue(displayedValue + digit);
     }
   };
 
-  const addOperator = (operator: string): void => {
-    if (valueDisplay.length > 0) {
-      setStack(stack.push(valueDisplay));
+  const handleOperatorClick = (operator: string) => {
+    if (displayedValue.length === 0) {
+      return;
     }
-    setValueDisplay(operator);
+
+    try {
+      setStack(stack.push(displayedValue));
+
+      if (displayedOperator !== "") {
+        setStack(stack.push(displayedOperator));
+      }
+
+      setDisplayedOperator(operator);
+      setDisplayedValue("");
+    } catch (err: unknown) {
+      setDisplayedOperator("");
+      setDisplayedValue("ERR");
+    }
   };
 
   const numberButtons: JSX.Element[] = [];
@@ -29,13 +44,16 @@ function App() {
 
   const operatorButtons: JSX.Element[] = ["+", "-", "*", "/"].map(
     (operator) => (
-      <button onClick={() => addOperator(operator)}>{operator}</button>
+      <button onClick={() => handleOperatorClick(operator)}>{operator}</button>
     ),
   );
 
   return (
     <div id="App">
-      <ResultDisplay value={valueDisplay} />
+      <div>
+        <div>{displayedOperator}</div>
+        <ResultDisplay value={displayedValue} />
+      </div>
       <div>{numberButtons.map((btn) => btn)}</div>
       <div>{operatorButtons.map((btn) => btn)}</div>
     </div>
